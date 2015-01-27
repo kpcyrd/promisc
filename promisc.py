@@ -2,6 +2,8 @@
 from ConfigParser import RawConfigParser
 from irc.bot import SingleServerIRCBot
 
+TRIGGER = 'peer pl0x'
+
 
 class Promisc(SingleServerIRCBot):
     def __init__(self, server, channel, nick, real, port=6667):
@@ -17,7 +19,16 @@ class Promisc(SingleServerIRCBot):
 
     def on_privmsg(self, c, e):
         nick = e.source.nick
-        c.privmsg(nick, 'likes to peer')
+        msg = e.arguments[0]
+
+        if not re.match('^[a-zA-Z0-9_]+$', nick):
+            c.privmsg(nick, 'your nick looks too scary')
+        elif msg == TRIGGER:
+            c.privmsg(nick, 'generating credentials...')
+            c.privmsg(nick, '> cjdns peer string')
+            c.privmsg(nick, '> yrd command')
+        else:
+            c.privmsg(nick, 'not understood, type %r' % TRIGGER)
 
     def on_pubmsg(self, c, e):
         if e.arguments[0] == '!peers':
